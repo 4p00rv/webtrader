@@ -7,7 +7,7 @@ import windows from '../windows/windows';
 import rv from '../common/rivetsExtra';
 import _ from 'lodash';
 import html from 'text!./password.html';
-import 'css!./password.css';
+import './password.css';
 
 let password_win = null;
 let password_win_view = null;

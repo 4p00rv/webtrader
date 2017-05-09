@@ -7,6 +7,7 @@ import liveapi from 'websockets/binary_websockets';
 import menu from 'navigation/menu';
 import 'datatables';
 import 'jquery-growl';
+import './tradingTimes.css';
 
 let table = null;
 let tradingWin = null;
@@ -68,7 +69,6 @@ const processData = (markets) => {
 }
 
 export const init = ($menuLink) => {
-   require(["css!tradingtimes/tradingTimes.css"]);
    $menuLink.click(() => {
       if (!tradingWin) {
          tradingWin = windows.createBlankWindow($('<div/>'), {

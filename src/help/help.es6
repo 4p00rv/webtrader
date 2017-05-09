@@ -3,7 +3,7 @@ import windows from 'windows/windows';
 import rv from 'common/rivetsExtra';
 import html from 'text!help/help.html';
 import content from 'text!help/content.html'
-import 'css!help/help.css';
+import './help.scss';
 
 "use strict";
 

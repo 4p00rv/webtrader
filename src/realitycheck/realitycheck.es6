@@ -9,6 +9,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import 'jquery-growl';
 import '../common/util';
+import './realitycheck.css';
 
 let win = null, timerHandler = null, promises= [];
 const FIRST_SCREEN_HEIGHT = 260, SECOND_SCREEN_HEIGHT = 310;
@@ -107,7 +108,7 @@ const init = () => {
                .then((data) => {
                   if (data && data.landing_company_details.has_reality_check) {
 
-                     require(['text!realitycheck/realitycheck.html', "css!realitycheck/realitycheck.css"], (html) => {
+                     require(['text!realitycheck/realitycheck.html'], (html) => {
                         const div = $(html).i18n();
                         win = windows.createBlankWindow($('<div/>'), {
                            title: 'Reality check'.i18n(),

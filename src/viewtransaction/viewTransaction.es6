@@ -12,10 +12,10 @@ import _ from 'lodash';
 import 'jquery-growl';
 import 'common/util';
 import { Longcode } from 'binary-longcode';
+import './viewTransaction.css';
 
 const open_dialogs = {};
 
-require(['css!viewtransaction/viewTransaction.css']);
 require(['text!viewtransaction/viewTransaction.html']);
 
 let market_data_disruption_win = null;
@@ -314,12 +314,11 @@ const init_dialog = (proposal) => {
 
 const sell_at_market = (state, root) => {
    state.sell.sell_at_market_enabled = false; /* disable button */
-   require(['text!viewtransaction/viewTransactionConfirm.html', 'css!viewtransaction/viewTransactionConfirm.css']);
    liveapi.send({sell: state.contract_id, price: 0 /* to sell at market */})
       .then((data) => {
          state.table.user_sold = true; //User successfully sold the contract
          const sell = data.sell;
-         require(['text!viewtransaction/viewTransactionConfirm.html', 'css!viewtransaction/viewTransactionConfirm.css'],
+         require(['text!viewtransaction/viewTransactionConfirm.html', './viewTransactionConfirm.css'],
             (html) => {
                const buy_price = state.table.buy_price;
                const state_confirm = {

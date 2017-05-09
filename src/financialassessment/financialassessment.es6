@@ -6,7 +6,7 @@ import _ from 'lodash';
 import liveapi from 'websockets/binary_websockets';
 import 'common/util';
 import 'jquery-growl';
-import 'css!./financialassessment.css'
+import './financialassessment.scss'
 
 let win = null,
   win_view = null;

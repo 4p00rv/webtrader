@@ -7,7 +7,7 @@ import liveapi from '../websockets/binary_websockets';
 import rv from '../common/rivetsExtra';
 import $navHtml from 'text!./navigation.html';
 import '../common/util';
-import 'css!navigation/navigation.css';
+import './navigation.css';
 
 export const updateDropdownToggles = () => {
    $("#nav-menu .nav-dropdown-toggle").each(function(){

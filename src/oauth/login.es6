@@ -7,7 +7,7 @@ import windows from '../windows/windows';
 import rv from '../common/rivetsExtra';
 import _ from 'lodash';
 import html from 'text!./login.html';
-import 'css!./login.css';
+import './login.css';
 
 let login_win = null;
 let login_win_view = null; // rivets view

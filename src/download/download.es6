@@ -11,7 +11,7 @@ import 'jquery-ui';
 import 'jquery-growl';
 import '../common/util';
 import 'highstock-release/modules/offline-exporting';
-import 'css!./download.css';
+import './download.scss';
 
 import html from 'text!./download.html';
 

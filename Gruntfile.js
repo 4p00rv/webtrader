@@ -272,6 +272,15 @@ module.exports = function (grunt) {
                     keepalive: true,
                     livereload: true
                 }
+            },
+            webpack : {
+                options: {
+                    port: 9001,
+                    base: 'dist/bundle',
+                    hostname: '0.0.0.0',
+                    keepalive: true,
+                    livereload: true
+                }
             }
         },
         sloc: {

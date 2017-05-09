@@ -10,6 +10,7 @@ import moment from "moment";
 import html from "text!selfexclusion/selfexclusion.html";
 import "jquery-growl";
 import "common/util";
+import "selfexclusion/selfexclusion.css";
 
 
 let win = null,
@@ -177,7 +178,6 @@ const settingsData = {
 };
 
 const init_win = function() {
-    require(["css!selfexclusion/selfexclusion.css"]);
     return new Promise(function(res) {
         const div = $(html).i18n();
         div.find(".datepicker").datepicker({

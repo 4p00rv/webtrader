@@ -6,7 +6,7 @@ import moment from 'moment';
 import clipboard from 'clipboard';
 import html from 'text!token/token.html';
 import {find} from 'lodash';
-import 'css!token/token.css';
+import './token.css';
 
 let token_win = null;
 let token_win_view = null;

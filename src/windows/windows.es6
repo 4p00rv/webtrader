@@ -10,7 +10,7 @@ import tracker from 'windows/tracker';
 import 'jquery.dialogextend';
 import 'modernizr';
 import 'common/util';
-import 'css!windows/windows.css';
+import './windows.css';
 
 let closeAllObject = null, dialogCounter = 0, $menuUL = null, last_dialog = null;
 

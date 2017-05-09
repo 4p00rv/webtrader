@@ -9,7 +9,7 @@ import liveapi from '../websockets/binary_websockets';
 import rv from '../common/rivetsExtra';
 import chartingRequestMap from '../charts/chartingRequestMap';
 import html from 'text!../trade/tradeConf.html';
-import 'css!../trade/tradeConf.css';
+import './tradeConf.css';
 import { Longcode } from 'binary-longcode';
 
 /* rv binder to show tick chart for this confirmation dialog */

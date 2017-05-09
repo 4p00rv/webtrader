@@ -10,7 +10,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import navigation from 'navigation/navigation';
 import html from 'text!realaccount/realaccount.html';
-import 'css!realaccount/realaccount.css';
+import './realaccount.css';
 
 let real_win = null;
 let real_win_view = null; // rivets view

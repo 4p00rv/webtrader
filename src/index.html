@@ -7,10 +7,10 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
     <title>Binary.com : Webtrader</title>
-    <script src="v<version>/lib/intl/dist/Intl.complete.js"></script>
-    <script src="v<version>/common/util.js"></script>
-    <script src="v<version>/lib/jquery/dist/jquery.min.js"></script>
-    <script src="v<version>/lib/moment/min/moment.min.js"></script>
+    <script src="lib/intl/dist/Intl.complete.js"></script>
+    <script src="common/util.js"></script>
+    <script src="lib/jquery/dist/jquery.min.js"></script>
+    <script src="lib/moment/min/moment.min.js"></script>
     <script src="<style-url>/binary.js"></script>
     <link rel="apple-touch-icon" sizes="57x57" href="<style-url>/images/favicons/apple-touch-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="114x114" href="<style-url>/images/favicons/apple-touch-icon-114x114.png">
@@ -26,7 +26,7 @@
     <link rel="icon" type="image/png" sizes="96x96" href="<style-url>/images/favicons/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="<style-url>/images/favicons/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="<style-url>/images/favicons/favicon-32x32.png">
-    <link rel="stylesheet" type="text/css" href="v<version>/index.css">
+    <link rel="stylesheet" type="text/css" href="index.css">
     <link rel="stylesheet" type="text/css" href="<style-url>/binary.css">
 </head>
 
@@ -215,7 +215,7 @@
         }
         function translate() {
             if (isLangSupported(lang)) {
-                $.getJSON('v<version>/i18n/' + lang + '.json', function (data) {
+                $.getJSON('translations/i18n/json/' + lang + '.json', function (data) {
                     setup_i18n_translation(data);
                 });
                 // Show hidden languages
@@ -233,7 +233,7 @@
             $(".time").text(time);
         }
         function openTradingPage() {
-            window.location.href = 'v<version>/main.html' + suffix;
+            window.location.href = 'main.html' + suffix;
         }
         function openContactUs() {
             var url = 'https://www.binary.com/' + (local_storage.get('i18n') || { value: 'en' }).value + '/contact.html'

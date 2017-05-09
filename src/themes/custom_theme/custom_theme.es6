@@ -6,7 +6,7 @@ import windows from '../../windows/windows';
 import 'highstock-release/highstock';
 import 'color-picker';
 import html from 'text!./custom_theme.html';
-import 'css!./custom_theme.css';
+import './custom_theme.css';
 
 const chartData = [
    [1452412800, 32.87, 33.75, 32.50, 33.28], [1452427200, 33.27, 34.45, 32.81, 34.22],

@@ -9,7 +9,7 @@ import viewTransaction from '../viewtransaction/viewTransaction';
 import "datatables";
 import "jquery-growl";
 import '../common/util';
-import "css!./profitTable.css";
+import "./profitTable.css";
 import html from 'text!./profitTable.html';
 import { Longcode } from 'binary-longcode';
 

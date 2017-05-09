@@ -11,9 +11,9 @@ import _ from 'lodash';
 import moment from 'moment';
 import tncApprovalWin from "cashier/uk_funds_protection"
 import html from 'text!cashier/deposit.html';
+import 'cashier/deposit.scss';
+import 'text!cashier/deposit.html';
 
-require(['text!cashier/deposit.html']);
-require(['css!cashier/deposit.css']);
 let deposit_win = null;
 let deposit_win_view = null; // rivets view
 

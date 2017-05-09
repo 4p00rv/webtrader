@@ -8,7 +8,7 @@ import liveapi from '../websockets/binary_websockets';
 import 'jquery-ui';
 import 'datatables';
 import 'jquery-growl';
-import 'css!./portfolio.css';
+import './portfolio.css';
 import { Longcode } from 'binary-longcode';
 
 let portfolioWin = null;

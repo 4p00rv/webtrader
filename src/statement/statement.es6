@@ -7,7 +7,7 @@ import liveapi from "../websockets/binary_websockets";
 import _ from "lodash";
 import "datatables";
 import "jquery-growl";
-import 'css!./statement.css';
+import './statement.css';
 import html from 'text!./statement.html';
 import viewTransaction from '../viewtransaction/viewTransaction';
 import { Longcode } from 'binary-longcode';

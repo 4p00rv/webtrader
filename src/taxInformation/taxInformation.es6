@@ -1,4 +1,4 @@
-import 'css!taxInformation/taxInformation.css';
+import './taxInformation.scss';
 import rv from 'common/rivetsExtra';
 import $ from 'jquery';
 import windows from 'windows/windows';

@@ -11,9 +11,9 @@ import { debounce } from 'lodash'
 import moment from 'moment';
 import tncApprovalWin from 'cashier/uk_funds_protection';
 import html from 'text!cashier/withdraw.html';
+import 'cashier/withdraw.scss';
+import 'text!cashier/withdraw.html'
 
-require(['text!cashier/withdraw.html']);
-require(['css!cashier/withdraw.css']);
 let win = null;
 let win_view = null;
 

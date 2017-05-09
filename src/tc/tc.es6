@@ -5,7 +5,7 @@ import $ from "jquery";
 import windows from "../windows/windows";
 import liveapi from "../websockets/binary_websockets";
 import html from 'text!./tc.html';
-import 'css!./tc.css';
+import './tc.css';
 
 let win = null,
     landing_company_name = '';

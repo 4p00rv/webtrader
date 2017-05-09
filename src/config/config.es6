@@ -7,7 +7,7 @@ import rv from '../common/rivetsExtra';
 import _ from 'lodash';
 import '../common/util';
 import html from 'text!./config.html';
-import 'css!./config.css';
+import './config.css';
 
 let win = null, win_view = null;
 
