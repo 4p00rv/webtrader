@@ -187,11 +187,11 @@ const update_indicative = (data, state) => {
    const id = contract.contract_id || data.echo_req.contract_id,
       bid_price = contract.bid_price;
    if(contract.is_sold && !contract.exit_tick && !contract.exit_level && !state.table.user_sold && !contract.sell_spot) {
-      
+
       liveapi.send({contract_id: id, proposal_open_contract: 1});
       return;
    }
-   
+
    state.table.user_sold = contract.sell_time && contract.sell_time < contract.date_expiry
 
    if(id != state.contract_id) { return; }
@@ -245,7 +245,7 @@ const update_indicative = (data, state) => {
 
    // Some times backend doesn't send the entry-spot in the beginning. Setting it here to avoid any errors.
    state.table.entry_tick = contract.entry_tick ? contract.entry_tick : state.table.entry_tick;
-   state.table.entry_tick_time = contract.entry_tick_time ? contract.entry_tick_time : state.table.entry_tick_time;   
+   state.table.entry_tick_time = contract.entry_tick_time ? contract.entry_tick_time : state.table.entry_tick_time;
 
    if(contract.is_sold){
       state.table.is_sold = contract.is_sold;

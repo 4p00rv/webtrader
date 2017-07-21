@@ -18,74 +18,76 @@ module.exports = {
         path: path.resolve(__dirname, 'dist/bundle/')
     },
     module: {
-        rules: [{
-            test: /(\.js\.map)$/,
-            use: 'ignore-loader'
-        }, {
+        loaders: [{
             test: /^timepicker$/,
-            use: 'imports?jquery-ui,jquery'
+            loader: 'imports?jquery-ui,jquery'
         }, {
             test: /^jquery-ui$/,
-            use: 'jquery'
+            loader: 'jquery'
         }, {
             test: /^babel-runtime\/regenerator$/,
-            use: 'exports?regeneratorRuntime',
+            loader: 'exports?regeneratorRuntime',
         }, {
             test: /^highstock-release\/highstock$/,
-            use: 'exports?Highcharts!imports?jquery',
+            loader: 'exports?Highcharts!imports?jquery',
         }, {
             "test": /^highstock-release\/modules\/exporting$/,
-            "use": "imports?highstock-release/highstock"
+            "loader": "imports?highstock-release/highstock"
         }, {
             "test": /^highstock-release\/modules\/offline-exporting$/,
-            "use": "imports?highstock-release/modules/exporting"
+            "loader": "imports?highstock-release/modules/exporting"
         }, {
             "test": /^jquery-growl$/,
-            "use": "imports?jquery"
+            "loader": "imports?jquery"
         }, {
             "test": /^datatables$/,
-            "use": "imports?jquery-ui"
+            "loader": "imports?jquery-ui"
         }, {
             "test": /^currentPriceIndicator$/,
-            "use": "imports?highstock-release/highstock"
+            "loader": "imports?highstock-release/highstock"
         }, {
             "test": /^sightglass$/,
-            "use": "exports?sightglass"
+            "loader": "exports?sightglass"
         }, {
             "test": /^rivets$/,
-            "use": "exports?rivets!imports?sightglass"
+            "loader": "exports?rivets!imports?sightglass"
         }, {
             "test": /^highstock-release\/highcharts-more$/,
-            "use": "imports?highstock-release/highstock"
+            "loader": "imports?highstock-release/highstock"
         }, {
             "test": /^color-picker$/,
-            "use": "imports?jquery"
-        }, {
-            "test": /^binary-longcode$/,
-            "use": "imports?moment"
+            "loader": "imports?jquery"
         }, {
             test: /\.es6$/,
+            loader: 'babel-loader',
+            include: [path.resolve(__dirname, 'src')],
             exclude: [/node_modules/],
-            use: [{
-                loader: 'babel-loader',
-                options: {
-                    presets: ['es2015'],
-                    plugins: ['syntax-dynamic-import']
-                }
-            }],
+            query: {
+                plugins: [
+                    "transform-runtime",
+                    "typecheck",
+                    "transform-decorators-legacy",
+                    "transform-class-properties",
+                    "add-module-exports",
+                    "import-asserts",
+                    "syntax-async-functions",
+                    "transform-regenerator",
+                ],
+                presets: ['es2015', 'stage-0']
+            },
         }, {
-            test: /\.scss$/,
-            use: ['style-loader', 'css-loader', 'sass-loader']
-        }, {
-            test: /\.css$/,
-            use: ['style-loader', 'css-loader']
+            test: /\.(css$|scss$)/,
+            loaders: ['style-loader', 'css-loader', 'sass-loader']
         }, {
             test: /\.(jpe?g|png|gif|svg)$/,
             loader: "file-loader?name=images/[name].[ext]"
         }, {
             test: /\.(eot|svg|ttf|woff|woff2)$/,
             loader: 'file-loader?name=fonts/[name].[ext]'
-        }],
+        },
+            { test: /\.(json$)/, loader: 'json-loader' },
+            { test: /\.(html$)/, loader: 'html-loader' },
+        ],
     },
     plugins: [
         new CopyWebpackPlugin([
@@ -112,7 +114,7 @@ module.exports = {
                 from: 'bower_components/jquery/dist/jquery.min.js',
                 to: 'lib/jquery/dist/jquery.min.js'
             }, {
-                from: 'bower_components/moment/min/moment.min.js',
+                from: 'node_modules/moment/min/moment.min.js',
                 to: 'lib/moment/min/moment.min.js'
             }, {
                 from: 'bower_components/alameda/alameda.js',
@@ -166,7 +168,6 @@ module.exports = {
             'clipboard': 'clipboard/dist/clipboard.min',
             "indicator_levels": 'charts/indicators/level',
             'babel-runtime/regenerator': 'regenerator-runtime/runtime',
-            'webtrader-charts': 'webtrader-charts/dist/webtrader-charts',
             'chosen': 'chosen-js/chosen.jquery',
             'highstock-release': 'highstock-release',
             'binary-longcode': 'binary-com-longcode/dist/main'
