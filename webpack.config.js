@@ -3,6 +3,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const StringDecoder = require('string_decoder').StringDecoder;
 const decoder = new StringDecoder('utf8');
 const Sass = require('sass.js/dist/sass.node');
+const webpack = require('webpack');
+
 //Convert src/index.scss to css
 let index_css = '';
 Sass('src/index.scss', function (result) {
@@ -11,7 +13,7 @@ Sass('src/index.scss', function (result) {
 
 module.exports = {
     entry: {
-        main: "./src/main.js"
+        main: ['babel-polyfill', "./src/main.js"]
     },
     output: {
         filename: '[name].js',
@@ -80,9 +82,9 @@ module.exports = {
             loaders: ['style-loader', 'css-loader', 'sass-loader']
         }, {
             test: /\.(jpe?g|png|gif|svg)$/,
-            loader: "file-loader?name=images/[name].[ext]"
+            loader: "file-loader"
         }, {
-            test: /\.(eot|svg|ttf|woff|woff2)$/,
+            test: /\.(eot|ttf|woff|woff2)$/,
             loader: 'file-loader?name=fonts/[name].[ext]'
         },
             { test: /\.(json$)/, loader: 'json-loader' },
@@ -134,18 +136,27 @@ module.exports = {
                     return Buffer.from(decoded_content.replace(/<style-url>/g, 'https://style.binary.com'))
                 }
             }
-        ])
+        ]),
+        new webpack.ContextReplacementPlugin(/^\.\/locale$/, context => {
+            if (!/\/moment\//.test(context.context)) { return }
+            // context needs to be modified in place
+            Object.assign(context, {
+                // include only CJK
+                regExp: /^\.\/(ja|ko|zh)/,
+                // point to the locale data folder relative to moment's src/lib/locale
+                request: '../locale'
+            })
+        }),
+        new webpack.DefinePlugin({
+            'process.env.NODE_ENV': '"development"',
+            'global': {}, // bizarre lodash(?) webpack workaround
+            'global.GENTLY': false // superagent client fix
+        })
     ],
-    resolveLoader: {
-        alias: {
-            'css': 'style-loader!css-loader!sass-loader',
-            'text': 'file-loader?name=[path][name].[ext]!extract-loader!html-loader?attrs=false'
-        }
-    },
     target: 'node',
     resolve: {
         modules: ['node_modules', 'bower_components', 'translations', 'src'],
-        extensions: ['.es6', '.js'],
+        extensions: ['.es6', '.js', '.css', '.scss'],
         alias: {
             'jquery': "jquery/dist/jquery.min",
             'jquery-ui': "jquery-ui/jquery-ui.min",
@@ -170,7 +181,7 @@ module.exports = {
             'babel-runtime/regenerator': 'regenerator-runtime/runtime',
             'chosen': 'chosen-js/chosen.jquery',
             'highstock-release': 'highstock-release',
-            'binary-longcode': 'binary-com-longcode/dist/main'
+            'jquery-growl': 'jquery.growl'
         }
     }
 }

@@ -6,7 +6,7 @@ import liveapi from '../websockets/binary_websockets';
 import windows from '../windows/windows';
 import rv from '../common/rivetsExtra';
 import _ from 'lodash';
-import html from 'text!./password.html';
+import html from './password.html';
 import './password.css';
 
 let password_win = null;

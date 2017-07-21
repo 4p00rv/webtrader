@@ -8,7 +8,7 @@ import _ from "lodash";
 import "datatables";
 import "jquery-growl";
 import './statement.css';
-import html from 'text!./statement.html';
+import html from './statement.html';
 import viewTransaction from '../viewtransaction/viewTransaction';
 
 let statement = null,

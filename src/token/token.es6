@@ -4,7 +4,7 @@ import windows from 'windows/windows';
 import rv from 'common/rivetsExtra';
 import moment from 'moment';
 import clipboard from 'clipboard';
-import html from 'text!token/token.html';
+import html from 'token/token.html';
 import {find} from 'lodash';
 import './token.css';
 

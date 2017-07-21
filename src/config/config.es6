@@ -6,7 +6,7 @@ import windows from '../windows/windows';
 import rv from '../common/rivetsExtra';
 import _ from 'lodash';
 import '../common/util';
-import html from 'text!./config.html';
+import html from './config.html';
 import './config.css';
 
 let win = null, win_view = null;

@@ -7,7 +7,7 @@ import liveapi from "websockets/binary_websockets";
 import _ from "lodash";
 import rv from "common/rivetsExtra";
 import moment from "moment";
-import html from "text!selfexclusion/selfexclusion.html";
+import html from "selfexclusion/selfexclusion.html";
 import "jquery-growl";
 import "common/util";
 import "selfexclusion/selfexclusion.css";

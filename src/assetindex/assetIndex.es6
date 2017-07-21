@@ -8,6 +8,7 @@ import menu from "../navigation/menu";
 import _ from "lodash";
 import "datatables";
 import "jquery-growl";
+import html from './assetIndex.html';
 
 let table = null;
 let assetWin = null;
@@ -27,7 +28,7 @@ export const init = (li) => {
                 data: null
             });
             assetWin.dialog('open'); /* bring window to front */
-            require(['text!assetindex/assetIndex.html'], initAssetWin);
+            initAssetWin(html);
         } else
             assetWin.moveToTop();
     });

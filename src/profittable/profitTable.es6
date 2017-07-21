@@ -10,7 +10,7 @@ import "datatables";
 import "jquery-growl";
 import '../common/util';
 import "./profitTable.css";
-import html from 'text!./profitTable.html';
+import html from './profitTable.html';
 
 let profitWin = null,
    table = null,

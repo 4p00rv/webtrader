@@ -11,11 +11,12 @@ import moment from 'moment';
 import _ from 'lodash';
 import 'jquery-growl';
 import 'common/util';
+import './viewTransaction.css';
+import './viewTransactionConfirm.css';
+import html from './viewTransaction.html';
+import confirmHtml from './viewTransactionConfirm.html'
 
 const open_dialogs = {};
-
-require(['css!viewtransaction/viewTransaction.css']);
-require(['text!viewtransaction/viewTransaction.html']);
 
 let market_data_disruption_win = null;
 const show_market_data_disruption_win = (proposal) => {
@@ -273,70 +274,64 @@ const update_indicative = (data, state) => {
 }
 
 const init_dialog = (proposal) => {
-   require(['text!viewtransaction/viewTransaction.html'],(html) => {
-      const root = $(html).i18n();
-      const state = init_state(proposal, root);
-      const on_proposal_open_contract = (data) => update_indicative(data, state);
+   const root = $(html).i18n();
+   const state = init_state(proposal, root);
+   const on_proposal_open_contract = (data) => update_indicative(data, state);
 
-      const transWin = windows.createBlankWindow(root, {
-         title: proposal.display_name + ' (' + proposal.transaction_id + ')',
-         width: 700,
-         minWidth: 490,
-         minHeight:480,
-         height:480,
-         destroy: () => { },
-         close: function() {
-            view && view.unbind();
-            liveapi.proposal_open_contract.forget(proposal.contract_id);
-            liveapi.events.off('proposal_open_contract', on_proposal_open_contract);
-            for(let i = 0; i < state.onclose.length; ++i)
-               state.onclose[i]();
-            $(this).dialog('destroy').remove();
-            open_dialogs[proposal.transaction_id] = undefined;
-         },
-         open: () => {
-            liveapi.proposal_open_contract.subscribe(proposal.contract_id);
-            liveapi.events.on('proposal_open_contract', on_proposal_open_contract);
-         },
-         resize: () => {
-            state.chart.manual_reflow();
-            // state.chart.chart && state.chart.chart.reflow();
-         },
-         'data-authorized': 'true'
-      });
-
-      transWin.dialog('open');
-      const view = rv.bind(root[0],state)
-      open_dialogs[proposal.transaction_id] = transWin;
+   const transWin = windows.createBlankWindow(root, {
+      title: proposal.display_name + ' (' + proposal.transaction_id + ')',
+      width: 700,
+      minWidth: 490,
+      minHeight:480,
+      height:480,
+      destroy: () => { },
+      close: function() {
+         view && view.unbind();
+         liveapi.proposal_open_contract.forget(proposal.contract_id);
+         liveapi.events.off('proposal_open_contract', on_proposal_open_contract);
+         for(let i = 0; i < state.onclose.length; ++i)
+            state.onclose[i]();
+         $(this).dialog('destroy').remove();
+         open_dialogs[proposal.transaction_id] = undefined;
+      },
+      open: () => {
+         liveapi.proposal_open_contract.subscribe(proposal.contract_id);
+         liveapi.events.on('proposal_open_contract', on_proposal_open_contract);
+      },
+      resize: () => {
+         state.chart.manual_reflow();
+         // state.chart.chart && state.chart.chart.reflow();
+      },
+      'data-authorized': 'true'
    });
+
+   transWin.dialog('open');
+   const view = rv.bind(root[0],state)
+   open_dialogs[proposal.transaction_id] = transWin;
 }
 
 const sell_at_market = (state, root) => {
    state.sell.sell_at_market_enabled = false; /* disable button */
-   require(['text!viewtransaction/viewTransactionConfirm.html', 'css!viewtransaction/viewTransactionConfirm.css']);
    liveapi.send({sell: state.contract_id, price: 0 /* to sell at market */})
       .then((data) => {
          state.table.user_sold = true; //User successfully sold the contract
          const sell = data.sell;
-         require(['text!viewtransaction/viewTransactionConfirm.html', 'css!viewtransaction/viewTransactionConfirm.css'],
-            (html) => {
-               const buy_price = state.table.buy_price;
-               const state_confirm = {
-                  longcode: state.longcode,
-                  buy_price: buy_price,
-                  sell_price: sell.sold_for,
-                  return_percent: (100*(sell.sold_for - buy_price)/buy_price).toFixed(2)+'%',
-                  transaction_id: sell.transaction_id,
-                  balance: sell.balance_after,
-                  currency: state.table.currency,
-               };
-               const $html = $(html).i18n();
-               root.after($html);
-               const view_confirm = rv.bind($html[0], state_confirm);
-               state.onclose.push(() => {
-                  view_confirm && view_confirm.unbind();
-               });
-            });
+         const buy_price = state.table.buy_price;
+         const state_confirm = {
+            longcode: state.longcode,
+            buy_price: buy_price,
+            sell_price: sell.sold_for,
+            return_percent: (100*(sell.sold_for - buy_price)/buy_price).toFixed(2)+'%',
+            transaction_id: sell.transaction_id,
+            balance: sell.balance_after,
+            currency: state.table.currency,
+         };
+         const $html = $(confirmHtml).i18n();
+         root.after($html);
+         const view_confirm = rv.bind($html[0], state_confirm);
+         state.onclose.push(() => {
+            view_confirm && view_confirm.unbind();
+         });
       })
       .catch((err) => {
          $.growl.error({ message: err.message });

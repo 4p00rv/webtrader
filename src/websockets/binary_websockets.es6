@@ -3,7 +3,7 @@
  */
 
 import $ from 'jquery';
-import app_ids_json from 'text!../oauth/app_id.json';
+import app_ids_json from '../oauth/app_id.json';
 import 'common/util';
 
 let is_authenitcated_session = false; /* wether or not the current websocket session is authenticated */

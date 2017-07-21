@@ -2,7 +2,7 @@ import './taxInformation.scss';
 import rv from 'common/rivetsExtra';
 import $ from 'jquery';
 import windows from 'windows/windows';
-import $html from 'text!./taxInformation.html';
+import $html from './taxInformation.html';
 import liveapi from 'websockets/binary_websockets';
 import _ from "lodash";
 import 'common/util';

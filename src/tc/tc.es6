@@ -4,7 +4,7 @@
 import $ from "jquery";
 import windows from "../windows/windows";
 import liveapi from "../websockets/binary_websockets";
-import html from 'text!./tc.html';
+import html from './tc.html';
 import './tc.css';
 
 let win = null,

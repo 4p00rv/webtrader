@@ -47,7 +47,7 @@ export const confirmationDialog = (themeObj, elementClass, elementText) => {
       win.moveToTop();
       return;
    }
-   require(['text!themes/themes.html'], ($html) => {
+   require(['themes/themes.html'], ($html) => {
       $html = $($html).i18n();
 
       win = windows.createBlankWindow($html, {

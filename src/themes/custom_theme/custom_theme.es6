@@ -5,7 +5,7 @@ import $ from 'jquery';
 import windows from '../../windows/windows';
 import 'highstock-release/highstock';
 import 'color-picker';
-import html from 'text!./custom_theme.html';
+import html from './custom_theme.html';
 import './custom_theme.css';
 
 const chartData = [

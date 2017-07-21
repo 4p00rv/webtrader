@@ -9,7 +9,7 @@ import rv from 'common/rivetsExtra';
 import _ from 'lodash';
 import moment from 'moment';
 import navigation from 'navigation/navigation';
-import html from 'text!realaccount/realaccount.html';
+import html from 'realaccount/realaccount.html';
 import './realaccount.css';
 
 let real_win = null;

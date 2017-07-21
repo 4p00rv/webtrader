@@ -1,5 +1,5 @@
 import rv from 'common/rivetsExtra';
-import $html from 'text!./financialassessment.html'
+import $html from './financialassessment.html'
 import $ from 'jquery';
 import windows from 'windows/windows';
 import _ from 'lodash';

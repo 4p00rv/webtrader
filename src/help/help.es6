@@ -1,8 +1,8 @@
 import $ from 'jquery';
 import windows from 'windows/windows';
 import rv from 'common/rivetsExtra';
-import html from 'text!help/help.html';
-import content from 'text!help/content.html'
+import html from 'help/help.html';
+import content from 'help/content.html'
 import './help.scss';
 
 "use strict";

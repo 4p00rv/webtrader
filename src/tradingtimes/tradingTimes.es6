@@ -83,7 +83,7 @@ export const init = ($menuLink) => {
             data: null
          });
          tradingWin.dialog('open');
-         require(['text!tradingtimes/tradingTimes.html'], initTradingWin);
+         require(['tradingtimes/tradingTimes.html'], initTradingWin);
       }
       else
          tradingWin.moveToTop();

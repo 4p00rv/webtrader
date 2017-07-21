@@ -1,7 +1,7 @@
 import windows from 'windows/windows';
 import rv from 'common/rivetsExtra';
 import liveapi from 'websockets/binary_websockets';
-import html from 'text!cashier/uk_funds_protection.html';
+import html from 'cashier/uk_funds_protection.html';
 
 export const init_win = () => new Promise((resolve, reject) => {
     const $html = $(html).i18n();

@@ -5,7 +5,7 @@ import $ from 'jquery';
 import windows from '../windows/windows';
 import moment from 'moment';
 import '../common/util';
-import html from 'text!./chrome.html';
+import html from './chrome.html';
 
 let win = null;
 //Trigger after 1 second - Give the injector some time to inject the DOM element

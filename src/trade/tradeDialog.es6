@@ -41,7 +41,7 @@ import windows from 'windows/windows';
 import rv from 'common/rivetsExtra';
 import liveapi from 'websockets/binary_websockets';
 import chartingRequestMap from 'charts/chartingRequestMap';
-import html from 'text!trade/tradeDialog.html';
+import html from 'trade/tradeDialog.html';
 import './tradeDialog.scss';
 import 'timepicker';
 import 'jquery-ui';

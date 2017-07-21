@@ -108,7 +108,7 @@ const init = () => {
                .then((data) => {
                   if (data && data.landing_company_details.has_reality_check) {
 
-                     require(['text!realitycheck/realitycheck.html'], (html) => {
+                     require(['realitycheck/realitycheck.html'], (html) => {
                         const div = $(html).i18n();
                         win = windows.createBlankWindow($('<div/>'), {
                            title: 'Reality check'.i18n(),

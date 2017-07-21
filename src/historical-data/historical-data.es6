@@ -5,10 +5,10 @@ import moment from 'moment';
 import 'highstock-release/modules/offline-exporting';
 import 'common/util';
 import wtcharts from 'webtrader-charts';
-import html from 'text!./historical-data.html';
+import html from './historical-data.html';
 import _ from 'lodash';
 import 'jquery-ui';
-import 'css!./historical-data.css';
+import './historical-data.css';
 import {getMarketData} from '../instruments/instruments';
 
 let dialog = null;

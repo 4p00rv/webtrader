@@ -2,9 +2,8 @@ import $ from 'jquery';
 import liveapi from 'websockets/binary_websockets';
 import windows from 'windows/windows';
 import rv from 'common/rivetsExtra';
-import html from 'text!cashier/currency.html';
-
-require(['common/util']);
+import html from './currency.html';
+import "../common/util";
 
 let check_promise = null;
 const check_currency_async = () => new Promise((resolve, reject) => {

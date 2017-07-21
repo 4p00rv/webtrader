@@ -5,7 +5,7 @@ import moment from 'moment';
 import _ from 'lodash';
 import liveapi from '../websockets/binary_websockets';
 import rv from '../common/rivetsExtra';
-import $navHtml from 'text!./navigation.html';
+import $navHtml from './navigation.html';
 import '../common/util';
 import './navigation.css';
 

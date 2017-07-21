@@ -6,13 +6,12 @@ import $ from 'jquery';
 import liveapi from 'websockets/binary_websockets';
 import windows from 'windows/windows';
 import rv from 'common/rivetsExtra';
-import currencyDialog from 'cashier/currency';
+import currencyDialog from './currency';
 import { debounce } from 'lodash'
 import moment from 'moment';
-import tncApprovalWin from 'cashier/uk_funds_protection';
-import html from 'text!cashier/withdraw.html';
-import 'cashier/withdraw.scss';
-import 'text!cashier/withdraw.html'
+import tncApprovalWin from './uk_funds_protection';
+import html from './withdraw.html';
+import './withdraw.scss';
 
 let win = null;
 let win_view = null;

@@ -6,7 +6,7 @@ import chartWindow from 'charts/chartWindow';
 import rv from 'common/rivetsExtra';
 import _ from 'lodash';
 
-require(['text!trade/tradeTemplateManager.html']);
+require(['trade/tradeTemplateManager.html']);
 
 if(!local_storage.get('trade-templates')) {
   local_storage.set('trade-templates', []);
@@ -23,7 +23,7 @@ class TradeTemplateManager {
     });
     local_storage.set("trade-templates", templates);
     const state = this.init_state(root, dialog);
-    require(['text!trade/tradeTemplateManager.html'], html => {
+    require(['trade/tradeTemplateManager.html'], html => {
       root.append(html.i18n());
       this.view = rv.bind(root[0], state);
     });

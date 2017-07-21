@@ -8,8 +8,9 @@ import moment from 'moment';
 import liveapi from '../websockets/binary_websockets';
 import rv from '../common/rivetsExtra';
 import chartingRequestMap from '../charts/chartingRequestMap';
-import html from 'text!../trade/tradeConf.html';
-import 'css!../trade/tradeConf.css';
+import html from './tradeConf.html';
+import './tradeConf.css';
+import viewTransaction from '../viewtransaction/viewTransaction.es6'
 
 /* rv binder to show tick chart for this confirmation dialog */
 rv.binders['tick-chart'] = {
@@ -321,10 +322,8 @@ export const init = (data, extra, show_callback, hide_callback) => {
       const $target = $(e.target);
       if(!$target.hasClass('disabled')) {
          $target.addClass('disabled');
-         require(['viewtransaction/viewTransaction'], (viewTransaction) => {
-            viewTransaction.init(extra.contract_id, extra.transaction_id)
-               .then(() => $target.removeClass('disabled'));
-         });
+         viewTransaction.init(extra.contract_id, extra.transaction_id)
+            .then(() => $target.removeClass('disabled'));
       }
    };
 
