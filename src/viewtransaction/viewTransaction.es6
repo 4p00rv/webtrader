@@ -1,4 +1,4 @@
-﻿/**
+﻿﻿/**
  * Created by amin on January 14, 2016.
  */
 
@@ -11,11 +11,10 @@ import moment from 'moment';
 import _ from 'lodash';
 import 'jquery-growl';
 import 'common/util';
-import { Longcode } from 'binary-longcode';
-import './viewTransaction.css';
 
 const open_dialogs = {};
 
+require(['css!viewtransaction/viewTransaction.css']);
 require(['text!viewtransaction/viewTransaction.html']);
 
 let market_data_disruption_win = null;
@@ -166,7 +165,7 @@ export const init = (contract_id, transaction_id) => {
             .then((data) => {
             const proposal = data.proposal_open_contract;
             /* check for market data disruption error */
-            if(proposal.underlying === undefined && proposal.longcode === undefined) {
+            if(proposal.underlying === undefined && proposal.shortcode === undefined) {
                show_market_data_disruption_win(proposal);
                return;
             }
@@ -314,11 +313,12 @@ const init_dialog = (proposal) => {
 
 const sell_at_market = (state, root) => {
    state.sell.sell_at_market_enabled = false; /* disable button */
+   require(['text!viewtransaction/viewTransactionConfirm.html', 'css!viewtransaction/viewTransactionConfirm.css']);
    liveapi.send({sell: state.contract_id, price: 0 /* to sell at market */})
       .then((data) => {
          state.table.user_sold = true; //User successfully sold the contract
          const sell = data.sell;
-         require(['text!viewtransaction/viewTransactionConfirm.html', './viewTransactionConfirm.css'],
+         require(['text!viewtransaction/viewTransactionConfirm.html', 'css!viewtransaction/viewTransactionConfirm.css'],
             (html) => {
                const buy_price = state.table.buy_price;
                const state_confirm = {
@@ -345,17 +345,13 @@ const sell_at_market = (state, root) => {
 }
 
 const init_state = (proposal, root) =>{   
-   const active_symbols = local_storage.get('active_symbols');
-   const currency = local_storage.get('currency') || 'USD';
-   const i18n = (local_storage.get('i18n') && local_storage.get('i18n').value) || 'en';
-   const longcode = new Longcode(active_symbols, i18n, currency);
    const state = {
       route: {
          value: 'table',
          update:(value) => { state.route.value = value; }
       },
       contract_id: proposal.contract_id,
-      longcode: longcode.get(proposal.shortcode),
+      longcode: proposal.longcode,
       validation: proposal.validation_error
       || (!proposal.is_valid_to_sell && 'Resale of this contract is not offered'.i18n())
       || ((proposal.is_settleable || proposal.is_sold) && 'This contract has expired'.i18n()) || '-',
@@ -380,7 +376,7 @@ const init_state = (proposal, root) =>{
 
          buy_price: proposal.buy_price,
          bid_price: undefined,
-         final_price: proposal.is_sold ? proposal.sell_price && formatPrice(proposal.sell_price) : undefined,
+         final_price: proposal.is_sold ? proposal.sell_price && formatPrice(proposal.sell_price, proposal.currency ||  'USD') : undefined,
 
          tick_count: proposal.tick_count,
          prediction: proposal.prediction,
