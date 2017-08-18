@@ -5,14 +5,13 @@
 import $ from 'jquery';
 import app_ids_json from '../oauth/app_id.json';
 import 'common/util';
-
 let is_authenitcated_session = false; /* wether or not the current websocket session is authenticated */
 let socket = null;
 let is_website_up = false;
 let queued_requests = {};
 
 const get_app_id = () => {
-   const app_ids = JSON.parse(app_ids_json);
+   const app_ids = app_ids_json;
    const config = local_storage.get('config');
    let token = (config && config.app_id) || '';
 
@@ -50,7 +49,7 @@ const connect = () => {
 
 let timeoutIsSet = false;
 const onclose = () => {
-   require(['windows/tracker'], (tracker) => {
+   import('windows/tracker').then((tracker) => {
       const trade_dialogs = tracker.get_trade_dialogs();
       const unique_dialogs = tracker.get_unique_dialogs();
       is_authenitcated_session = false;
@@ -483,7 +482,7 @@ const api = {
 }
 /* subscribe to website_status */
 api.events.on('website_status', (data) => {
-   is_website_up = data.website_status.site_status.toLowerCase() === 'up';
+   is_website_up = data.website_status && data.website_status.site_status.toLowerCase() === 'up';
    if(is_website_up) {
          //Resend all the queued requests
          for(let i in queued_requests) {

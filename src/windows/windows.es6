@@ -8,11 +8,15 @@ import _ from 'lodash';
 import navigation from 'navigation/navigation';
 import tracker from 'windows/tracker';
 import 'jquery.dialogextend';
-import 'modernizr';
+import 'imports-loader?this=>window!modernizr';
 import 'common/util';
-import './windows.css';
+import 'windows/windows.css';
+import workspace from  '../workspace/workspace';
+import chartWindowObj from "charts/chartWindow";
+import liveapi from "websockets/binary_websockets";
+import menu from "navigation/menu";
 
-let closeAllObject = null, dialogCounter = 0, $menuUL = null, last_dialog = null;
+let dialogCounter = 0;
 
 /* options: { width: 350, height: 400 } */
 const calculateChartCount = (options) => {
@@ -34,21 +38,6 @@ const calculateChartCount = (options) => {
    };
 }
 
-/* shuffle the given array */
-const shuffle = (array) => {
-   let temp, rand_inx;
-
-   for (let inx = array.length; inx > 0;) {
-      rand_inx = Math.floor(Math.random() * inx);
-      --inx;
-      temp = array[inx];
-      array[inx] = array[rand_inx];
-      array[rand_inx] = temp;
-   }
-
-   return array;
-}
-
 let callbacks = {};
 /* fire a custom event and call registered callbacks(api.events.on(name)) */
 const fire_event = (name , ...args) => {
@@ -60,101 +49,6 @@ const fire_event = (name , ...args) => {
    });
 }
 
-const tileDialogs = () => {
-   // get array of dialogs
-   var dialogs = $('.webtrader-dialog').filter((inx, d) => {
-      /* check to see if initialized and is visible */
-      const $d = $(d);
-      return $d.hasClass("ui-dialog-content") && $d.dialog("isOpen") &&
-            !$d.hasClass('ui-dialog-minimized') && ($(window).width() >= $d.dialog('option', 'width'));
-   });
-
-
-   const arrange = (dialogs, perform) => {
-      let total_free_space = 0;
-
-      const max_x = $(window).width();
-      let y = 110; // position of the next window from top
-      if($("#msg-notification").is(":visible"))
-            y = 150;
-
-      for (var inx = 0; inx < dialogs.length;) {
-         var inx_start = inx;
-         var row_height = 0; // height of the current row of dialogs
-         var x = 0; // positon of the next window from left
-
-         for (;/* see which which dialogs fit into current row */;) {
-            if (inx == dialogs.length)
-               break;
-            const d = $(dialogs[inx]);
-            const w = d.dialog('option', 'width'),
-               h = d.dialog('option', 'height');
-            row_height = Math.max(row_height, h);
-            if (x + w <= max_x) {
-               x += w;
-               ++inx;
-            }
-            else
-               break;
-         }
-
-         /* divide the vertical space equally between dialogs. */
-         const free_space = x < max_x ? (max_x - x) : 0;
-         let margin_left = x < max_x ? (max_x - x) / (inx - inx_start + 1) : 0; /* the current window might be wider than screen width */
-         if(inx != dialogs.length) { /* we don't care about extra space at last row */
-            total_free_space += free_space;
-         }
-         if (x === 0 && $(dialogs[inx]).dialog('option', 'width') > max_x) {
-            ++inx;
-            margin_left = 0;
-         };
-         x = 0;
-         for (var j = inx_start; j < inx; ++j) {
-            x += margin_left;
-            const d = $(dialogs[j]);
-            const w = d.dialog('option', 'width'),
-               h = d.dialog('option', 'height');
-
-            if(perform) /* are we testing or do we want to arrange elements */
-               d.dialog('widget').animate({
-                  left: x + 'px',
-                  top: y + 'px'
-               }, 1500, d.trigger.bind(d, 'animated'));
-            /* update dialog option.position */
-            d.dialog("option", "position", { my: x, at: y });
-            x += w;
-         };
-         y += row_height + 20;
-      }
-      return total_free_space;
-   }
-
-   /* we will try 100 different arrangements and pick the best one */
-   let best = null,
-      best_free_space = 1000*1000;
-   for (var i = 0; i < 100; ++i) {
-      shuffle(dialogs); // shuffle dialogs
-      var total_free_space = arrange(dialogs, false);
-      if (total_free_space < best_free_space) {
-         best = dialogs.slice(); // clone the array
-         best_free_space = total_free_space;
-      }
-   }
-   // get array of large dialogs (larger than window size)
-   const largeDialogs = $('.webtrader-dialog').filter(function (inx, d) {
-      /* check to see if initialized and is visible */
-      const $d = $(d);
-      return $d.hasClass("ui-dialog-content") && $d.dialog("isOpen") && !$d.hasClass('ui-dialog-minimized') && ($(window).width() < $d.dialog('option', 'width'));
-   });
-   _(largeDialogs).forEach(function (d) {
-      best.push(d);
-   });
-   arrange(best, true);
-   //Do not track last dialog after re-arranging dialogs
-   last_dialog = null;
-   //Trigger tile when the animation is done
-   setTimeout(() => fire_event("tile"), 1500 + 100);
-}
 
 /*
      @param: options.date    javascript Date object representing initial time
@@ -418,120 +312,104 @@ export const init = function($parentObj) {
       return original.apply(this, arguments);
    }
 
-   $menuUL = $parentObj.find("ul");
+    if(!tracker.is_empty()) {
+        tracker.reopen();
+        return;
+    }
+    const counts = calculateChartCount();
+    liveapi
+        .cached.send({trading_times: new Date().toISOString().slice(0, 10)})
+        .then((markets) => {
+        markets = menu.extractChartableMarkets(markets);
+        /* return a random element of an array */
+        const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
+        const timePeriods = ['2h', '4h', '8h', '1d'];
+        const chartTypes = ['candlestick', 'line', 'ohlc', 'spline']; //This is not the complete chart type list, however its good enough to randomly select one from this subset
+        for (let inx = 0; inx < counts.total; ++inx) {
+                const submarkets = rand(markets).submarkets;
+                const symbols = rand(submarkets).instruments;
+                const sym = rand(symbols);
+                const timePeriod = rand(timePeriods);
+                const chart_type = rand(chartTypes);
 
-   const tileObject = $menuUL.find(".tile");
-
-   closeAllObject = $menuUL.find(".closeAll");
-   closeAllObject.click(() => {
-      /* The close click is behaving weird.
-         Behavior - When there are charts opened, this event is able to close all charts and then
-         unable to hide the menu. When There are no charts, then it behaves normally */
-      if ($('.webtrader-dialog').length > 0) {
-         $('.webtrader-dialog').dialog('close');
-      }
-   });
-
-   //Attach click listener for tile menu
-   tileObject.click(tileDialogs);
-
-   require(["charts/chartWindow","websockets/binary_websockets", "navigation/menu"], (chartWindowObj,liveapi, menu) => {
-      if(!tracker.is_empty()) {
-         tracker.reopen();
-         return;
-      }
-      const counts = calculateChartCount();
-      liveapi
-         .cached.send({trading_times: new Date().toISOString().slice(0, 10)})
-         .then((markets) => {
-            markets = menu.extractChartableMarkets(markets);
-            /* return a random element of an array */
-            const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
-            const timePeriods = ['2h', '4h', '8h', '1d'];
-            const chartTypes = ['candlestick', 'line', 'ohlc', 'spline']; //This is not the complete chart type list, however its good enough to randomly select one from this subset
-            for (let inx = 0; inx < counts.total; ++inx) {
-               const submarkets = rand(markets).submarkets;
-               const symbols = rand(submarkets).instruments;
-               const sym = rand(symbols);
-               const timePeriod = rand(timePeriods);
-               const chart_type = rand(chartTypes);
-
-               chartWindowObj.addNewWindow({
-                  instrumentCode: sym.symbol,
-                  instrumentName: sym.display_name,
-                  timePeriod: timePeriod,
-                  type: chart_type,
-                  delayAmount: sym.delay_amount
-               });
-            }
-            tileDialogs(); // Trigger tile action
-         });
-   });
+                chartWindowObj.addNewWindow({
+                instrumentCode: sym.symbol,
+                instrumentName: sym.display_name,
+                timePeriod: timePeriod,
+                type: chart_type,
+                delayAmount: sym.delay_amount
+                });
+        }
+        workspace.tileDialogs(); // Trigger tile action
+        });
 
    /* automatically log the user in if we have oauth_token in local_storage */
-   require(['websockets/binary_websockets' ], (liveapi) => {
-      if(!local_storage.get('oauth')) {
-         return;
-      }
-      /* query string parameters can tempered.
-             make sure to get loginid from webapi instead */
-      var oauth = local_storage.get('oauth');
-      Promise.all(
-         oauth.slice(1)
-            .map(acc => ({ authorize: acc.token}))
-            .map(req => liveapi.send(req))
-      )
-         .then((results) =>
-            liveapi.cached.authorize()
-               .then((data) => {
-                  results.unshift(data);
-                  let is_jpy_account = false;
-                  for(let i = 0; i < results.length; ++i) {
-                     oauth[i].id = results[i].authorize.loginid;
-                     oauth[i].is_virtual = results[i].authorize.is_virtual;
-                     if (results[i].authorize.landing_company_name.indexOf('japan') !== -1) {
-                        is_jpy_account = true;
-                     }
-                  }
-                  local_storage.set('oauth', oauth);
-                  return is_jpy_account;
-               })
-         )
-         .then((is_jpy_account) => {
-            /* Japan accounts should not be allowed to login to webtrader */
-            if(is_jpy_account && is_jpy_account === true) {
-               liveapi.invalidate();
-               $.growl.error({message: 'Japan accounts are not supported.'.i18n(), duration: 6000 });
-               local_storage.remove('oauth');
-               local_storage.remove('oauth-login');
-            }
-         })
-         .catch((err) => {
-            //Switch to virtual account on selfexclusion error.
-            if(err.code==="SelfExclusion"){
-               //Login to virtual account instead.
-               oauth.forEach((ele, i) => {
-                  if(ele.id.match(/^VRTC/)){
-                     liveapi.switch_account(ele.id);
-                     return;
-                  }
-               });
-               return;
-            }
-            console.error(err.message);
-            $.growl.error({message: err.message});
-            //Remove token and trigger login-error event.
+    if(!local_storage.get('oauth')) {
+        return;
+    }
+    /* query string parameters can tempered.
+            make sure to get loginid from webapi instead */
+    var oauth = local_storage.get('oauth');
+    Promise.all(
+        oauth.slice(1)
+        .map(acc => ({ authorize: acc.token}))
+        .map(req => liveapi.send(req))
+    )
+        .then((results) =>
+        liveapi.cached.authorize()
+            .then((data) => {
+                const oauth = local_storage.get("oauth");
+                // Set currency for each account.
+                results.forEach((auth) => {
+                    if(auth.authorize) {
+                            const _curr = oauth.find((e) => e.id == auth.authorize.loginid);
+                            _curr.currency = auth.authorize.currency;
+                    }
+                });
+                local_storage.set("oauth", oauth);
+                results.unshift(data);
+                let is_jpy_account = false;
+                for(let i = 0; i < results.length; ++i) {
+                    oauth[i].id = results[i].authorize.loginid;
+                    oauth[i].is_virtual = results[i].authorize.is_virtual;
+                    if (results[i].authorize.landing_company_name.indexOf('japan') !== -1) {
+                    is_jpy_account = true;
+                    }
+                }
+                local_storage.set('oauth', oauth);
+                return is_jpy_account;
+            })
+        )
+        .then((is_jpy_account) => {
+        /* Japan accounts should not be allowed to login to webtrader */
+        if(is_jpy_account && is_jpy_account === true) {
+            liveapi.invalidate();
+            $.growl.error({message: 'Japan accounts are not supported.'.i18n(), duration: 6000 });
             local_storage.remove('oauth');
-            $(".login").trigger("login-error");
-         });
-   });
+            local_storage.remove('oauth-login');
+        }
+        })
+        .catch((err) => {
+        //Switch to virtual account on selfexclusion error.
+        if(err.code==="SelfExclusion"){
+            //Login to virtual account instead.
+            oauth.forEach((ele, i) => {
+                if(ele.id.match(/^VRTC/)){
+                    liveapi.switch_account(ele.id);
+                    return;
+                }
+            });
+            return;
+        }
+        console.error(err.message);
+        $.growl.error({message: err.message});
+        //Remove token and trigger login-error event.
+        local_storage.remove('oauth');
+        $(".login").trigger("login-error");
+        });
    $(window).scroll(fixMinimizedDialogsPosition);
    return this;
 }
-
-//Trigger close even on all dialogs
-export const closeAll = () => closeAllObject && closeAllObject.click();
-
 
 /* important options: {
    title:'',
@@ -575,24 +453,6 @@ export const createBlankWindow = function($html,options) {
          minimize: 'custom-icon-minimize',
          maximize: 'custom-icon-maximize'
       },
-      open: function() {
-         $(this).promise().done(function () {
-            const changePos = $(this).dialog("option","isTrackerInitiated");
-            const pos = $(this).dialog("option","relativePosition");
-            // Open chart at a relative position if it is a chart or trade type
-            if(!changePos && pos){
-               if(!$(last_dialog).parent().length){
-                  last_dialog = $(this);
-                  return;
-               }
-               const top = parseInt($(last_dialog).parent().css("top"));
-               const left = parseInt($(last_dialog).parent().css("left"));
-               $($(this).parent()).css("top",top+5+"px");
-               $($(this).parent()).css("left",left+5+"px");
-               last_dialog = $(this);
-            }
-         });
-      }
    }, options || {});
    options.minWidth = options.minWidth || options.width;
    options.minHeight = options.minHeight || options.height;
@@ -621,6 +481,18 @@ export const createBlankWindow = function($html,options) {
       blankWindow.on('dialogdestroy', options.destroy);
    }
 
+   blankWindow.on('dialogopen', function() {
+      _.defer(() => {
+         const top = ['#msg-notification', '#topbar', '#nav-menu'].map(selector => $(selector).outerHeight()).reduce((a,b) => a+b, 0);
+         const parent = $(this).parent();
+         if(parent.css('top').replace('px', '') * 1 <= top) {
+            parent.animate({
+               top: top + (Math.random()*15 | 0),
+               left: `+=${(Math.random()*10 | 0) - 20}px`,
+            }, 300, dialog.trigger.bind(dialog, 'animated'));
+         }
+      });
+   });
    blankWindow.moveToTop = () => {
       blankWindow.dialog('open');
       blankWindow.dialogExtend('restore');
@@ -628,30 +500,14 @@ export const createBlankWindow = function($html,options) {
    };
 
    // add an item to window menu
-   let li = null;
    const add_to_windows_menu = () => {
-      const link = $("<a href='#'>" + options.title + "</a>");
-      // bring window to top on click
-      link.click(blankWindow.moveToTop);
-      li = $('<li />').addClass(id + 'LI').html(link);
-      if($menuUL) {
-         $menuUL.append(li);
-      } else { // try in 10 seconds.
-         setTimeout(() => ($menuUL && $menuUL.append(li)), 10*10000);
-      }
+      const cleaner = workspace.addDialog(options.title, blankWindow.moveToTop, () => blankWindow.dialog('close'));
+      blankWindow.on('dialogclose', cleaner);
+
    };
    if(!options.ignoreTileAction) {
       add_to_windows_menu();
    }
-
-   // remove item from window menu on close
-   blankWindow.on('dialogclose', () => {
-      li && li.remove();
-      li = null;
-   });
-   blankWindow.on('dialogopen',
-      () => !li && !options.ignoreTileAction && add_to_windows_menu()
-   );
 
    if (options.resize) {
       options.resize.call($html[0]);
@@ -746,12 +602,8 @@ export const event_off = (name, cb) => {
    }
 }
 
-export const tile = tileDialogs;
 export default {
    init,
-   tile,
-   closeAll,
    createBlankWindow,
-   makeSelectmenu,
-   event_on, event_off
+   makeSelectmenu
 };

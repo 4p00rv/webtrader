@@ -38,15 +38,12 @@ const refresh_active_symbols = () => {
          markets = menu.sortMenu(markets);
 
          const trade = $("#nav-menu").find(".trade");
-         trade.find('> ul').remove();
-         const root = $("<ul>").appendTo(trade); /* add to trade menu */
-         menu.refreshMenu(root, markets, (li) => {
-            const data = li.data();
+         menu.refreshMenu(trade, markets, (symbol, display_name, pip) => {
             liveapi
-               .send({ contracts_for: data.symbol })
+               .send({ contracts_for: symbol })
                .then((res) => {
-                  require(['trade/tradeDialog'],
-                     (tradeDialog) => tradeDialog.init(data, res.contracts_for)
+                  import('trade/tradeDialog')
+                     .then((tradeDialog) => tradeDialog.init({symbol, display_name, pip}, res.contracts_for)
                   );
                }).catch(show_error);
          });
@@ -55,9 +52,9 @@ const refresh_active_symbols = () => {
 }
 
 export const init = () => {
-   require(['trade/tradeDialog']); // Trigger loading of tradeDialog
+   import('trade/tradeDialog'); // Trigger loading of tradeDialog
    refresh_active_symbols();
-   require(['websockets/binary_websockets'], (liveapi) => {
+   import('websockets/binary_websockets').then((liveapi) => {
       liveapi.events.on('login', refresh_active_symbols);
       liveapi.events.on('logout', refresh_active_symbols);
    });

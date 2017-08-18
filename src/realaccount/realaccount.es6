@@ -8,9 +8,9 @@ import windows from 'windows/windows';
 import rv from 'common/rivetsExtra';
 import _ from 'lodash';
 import moment from 'moment';
-import navigation from 'navigation/navigation';
+import { getLandingCompany } from 'navigation/navigation';
 import html from 'realaccount/realaccount.html';
-import './realaccount.css';
+import 'realaccount/realaccount.css';
 
 let real_win = null;
 let real_win_view = null; // rivets view
@@ -25,9 +25,9 @@ export const init = (li) => {
    real_win_li = li;
    li.click(() => {
       if (!real_win) {
-         navigation.getLandingCompany()
+         getLandingCompany()
             .then(
-               (what_todo) => init_real_win(html, what_todo)
+            (what_todo) => init_real_win(html, what_todo)
             )
             .catch(error_handler);
       } else {
@@ -40,7 +40,8 @@ const init_real_win = (root, what_todo) => {
    root = $(root).i18n();
    const _title = {
       'upgrade-mlt': 'Real Money Account Opening'.i18n(),
-      'upgrade-mf': 'Financial Account Opening form'.i18n()
+      'upgrade-mf': 'Financial Account Opening form'.i18n(),
+      'new-account': 'New Account'.i18n(),
    }[what_todo];
 
    real_win = windows.createBlankWindow(root, {
@@ -49,16 +50,15 @@ const init_real_win = (root, what_todo) => {
       collapsable: false,
       minimizable: true,
       maximizable: false,
-      width: 360,
-      height: 'auto',
-      'data-authorized': true,
+      width: 380,
+      height: 400,
       close: () => {
          real_win.dialog('destroy');
          real_win.trigger('dialogclose'); // TODO: figure out why event is not fired.
          real_win.remove();
          real_win = null;
       },
-      open: () => {},
+      open: () => { },
       destroy: () => {
          real_win_view && real_win_view.unbind();
          real_win_view = null;
@@ -103,7 +103,7 @@ const init_state = (root, what_todo) => {
          pep: false,
          salutation: 'Mr',
          salutation_array: ['Mr', 'Mrs', 'Ms', 'Miss'],
-         account_opening_reason_array: ['Speculative', 'Income Earning', 'Assets Saving', 'Hedging'],
+         account_opening_reason_array: ['Speculative', 'Income Earning', 'Hedging'],
          account_opening_reason: '',
          first_name: '',
          last_name: '',
@@ -129,13 +129,14 @@ const init_state = (root, what_todo) => {
          place_of_birth: '-',
          country_array: [{ text: '-', value: '-' }],
          tax_residence: '',
-         tax_identification_number: ''
+         tax_identification_number: '',
+         available_currencies: []
 
       },
       financial: {
          experience_array: ['0-1 year', '1-2 years', 'Over 3 years'],
          frequency_array: ['0-5 transactions in the past 12 months', '6-10 transactions in the past 12 months', '40 transactions or more in the past 12 months'],
-         
+
          forex_trading_experience: '',
          forex_trading_frequency: '',
          indices_trading_experience: '',
@@ -174,14 +175,20 @@ const init_state = (root, what_todo) => {
          ],
          occupation: '',
 
+         employment_status: '',
+         employment_status_array: ["Employed", "Pensioner", "Self-Employed", "Student", "Unemployed"],
+
+         source_of_wealth: '',
+         source_of_wealth_array: ["Accumulation of Income/Savings", "Cash Business", "Company Ownership", "Divorce Settlement", "Inheritance", "Investment Income", "Sale of Property", "Other"],
+
          accepted: false,
          disabled: false
       }
    };
 
-   state.input_disabled = local_storage.get("oauth").reduce((a,b)=>{
-         return a || /MLT/.test(b.id)
-      },false) && what_todo === "upgrade-mf";
+   state.input_disabled = local_storage.get("oauth").reduce((a, b) => {
+      return a || /MLT/.test(b.id)
+   }, false) && what_todo === "upgrade-mf";
 
    state.user.is_valid = () => {
       const user = state.user;
@@ -262,16 +269,36 @@ const init_state = (root, what_todo) => {
 
    state.financial.empty_fields = () => {
       return state.financial.forex_trading_experience === '' ||
-          state.financial.forex_trading_frequency === '' || state.financial.indices_trading_experience === '' ||
-          state.financial.indices_trading_frequency === '' || state.financial.commodities_trading_experience === '' ||
-          state.financial.commodities_trading_frequency === '' || state.financial.stocks_trading_experience === '' ||
-          state.financial.stocks_trading_frequency === '' || state.financial.other_derivatives_trading_experience === '' ||
-          state.financial.other_derivatives_trading_frequency === '' || state.financial.other_instruments_trading_experience === '' ||
-          state.financial.other_instruments_trading_frequency === '' || state.financial.employment_industry === '' ||
-          state.financial.occupation === '' || state.financial.education_level === '' ||
-          state.financial.income_source === '' || state.financial.net_income === '' ||
-          state.financial.account_turnover === '' || state.financial.estimated_worth === '';
+         state.financial.forex_trading_frequency === '' || state.financial.indices_trading_experience === '' ||
+         state.financial.indices_trading_frequency === '' || state.financial.commodities_trading_experience === '' ||
+         state.financial.commodities_trading_frequency === '' || state.financial.stocks_trading_experience === '' ||
+         state.financial.stocks_trading_frequency === '' || state.financial.other_derivatives_trading_experience === '' ||
+         state.financial.other_derivatives_trading_frequency === '' || state.financial.other_instruments_trading_experience === '' ||
+         state.financial.other_instruments_trading_frequency === '' || state.financial.employment_industry === '' ||
+         state.financial.occupation === '' || state.financial.education_level === '' ||
+         state.financial.income_source === '' || state.financial.net_income === '' ||
+         state.financial.account_turnover === '' || state.financial.estimated_worth === '' ||
+         state.financial.employment_status === '' || state.financial.source_of_wealth === '';;
    };
+
+   state.user.pep_window = (e) => {
+      e.preventDefault();
+      const text = `A Politically Exposed Person (PEP) is an individual who is or has been entrusted with a prominent public function including his/her immediate family members or persons known to be close associates of such persons, but does not include middle ranking or more junior officials.<br><br>
+         Such individuals include Heads of State, Ministers, Parliamentary Secretaries, Members of Parliament, Judges, Ambassadors, Senior Government Officials, High Ranking Officers in the Armed Forces, Audit Committees of the boards of central banks, and Directors of state-owned corporations.<br><br>
+         The “immediate family members” of the above examples will also be considered as PEP, and these include their spouses/partners, parents, and children. Additionally, “persons known to be close associates” of PEPs include their business partners, will also be considered as such.<br><br>
+         As a general rule, a person considered to be a PEP and who has ceased to be entrusted with a prominent public function for a period of at least twelve months no longer qualifies as a PEP.`;
+      windows.createBlankWindow(`<div style="padding:15px;">${text}</div>`, {
+         title: "PEP",
+         modal: true,
+         resizable: false,
+         collapsable: false,
+         minimizable: false,
+         maximizable: false,
+         closeOnEscape: true,
+         width: 500,
+         height: 'auto'
+      }).dialog("open");
+   }
 
    state.financial.click = () => {
       if (state.financial.empty_fields()) {
@@ -326,6 +353,9 @@ const init_state = (root, what_todo) => {
          income_source: financial.income_source,
          net_income: financial.net_income,
          estimated_worth: financial.estimated_worth,
+         employment_status: financial.employment_status,
+         source_of_wealth: financial.source_of_wealth,
+         account_turnover: financial.account_turnover,
          accept_risk: 1,
       };
       return request;
@@ -338,7 +368,7 @@ const init_state = (root, what_todo) => {
 
    state.risk.accept = () => {
       const request = state.financial.create_request();
-      if(!state.input_disabled) {
+      if (!state.input_disabled) {
          request.secret_question = state.user.secret_question_array[state.user.secret_question_inx];
          request.secret_answer = state.user.secret_answer;
       }
@@ -374,11 +404,66 @@ const init_state = (root, what_todo) => {
       real_win.dialog('widget').trigger('dialogresizestop');
    };
 
+   state.set_account_opening_reason = () => {
+      var req = { set_settings: 1 };
+      req.account_opening_reason = state.user.account_opening_reason;
+      state.user.disabled = true;
+      liveapi.send(req).then((data) => {
+         state.user.show_account_opening_reason = false;
+      }).catch((err) => {
+         error_handler(err);
+         state.user.disabled = false;
+      });
+   };
+
+   state.create_new_account = (curr) => {
+      const req = {
+         new_account_real: 1,
+         salutation: state.user.salutation || '',
+         first_name: state.user.first_name || '',
+         last_name: state.user.last_name || '',
+         date_of_birth: state.user.date_of_birth || '',
+         address_line_1: state.user.address_line_1 || '',
+         address_line_2: state.user.address_line_2 || '',
+         address_city: state.user.city_address || '',
+         address_state: state.user.state_address || '',
+         address_postcode: state.user.address_postcode || '',
+         phone: state.user.phone || '',
+         account_opening_reason: state.user.account_opening_reason,
+         residence: state.user.residence,
+      };
+      liveapi.send(req).then((data) => {
+         const info = data.new_account_real;
+         const oauth = local_storage.get('oauth');
+         oauth.push({ id: info.client_id, token: info.oauth_token, currency: curr, is_virtual: 0 });
+         local_storage.set('oauth', oauth);
+         $.growl.notice({ message: 'Account successfully created' });
+         $.growl.notice({ message: 'Switching to your new account ...' });
+         /* login with the new account */
+         return liveapi.switch_account(info.client_id)
+            .then(() => {
+               liveapi.send({set_account_currency: curr}).then(() => {
+                  local_storage.set("currency", curr);
+                  //For updating balance in navigation
+                  liveapi.send({ balance: 1, subscribe: 1 })
+                    .catch(function (err) { console.error(err); });
+                  real_win && real_win.dialog('close');
+                  real_win_li.hide();
+               });
+            });
+      }).catch((err) => {
+         error_handler(err);
+         real_win && real_win.dialog('close');
+         real_win_li.hide();
+      })
+   };
+
    real_win_view = rv.bind(root[0], state);
 
    /* get the residence field and its states */
    const residence_promise = liveapi.send({ get_settings: 1 })
       .then((data) => {
+         console.log(data);
          data = data.get_settings;
          state.user.salutation = data.salutation || state.user.salutation;
          state.user.first_name = data.first_name || '';
@@ -393,31 +478,70 @@ const init_state = (root, what_todo) => {
          state.user.phone = data.phone || '';
          state.user.residence = data.country_code || '';
          state.user.residence_name = data.country || '';
+         state.user.show_account_opening_reason = state.user.account_opening_reason === '';
       })
       .catch(error_handler);
 
    residence_promise
       .then(
-         () => liveapi.cached.send({ residence_list: 1 })
+      () => liveapi.cached.send({ residence_list: 1 })
       )
       .then((data) => {
          state.user.country_array = data.residence_list;
          state.user.place_of_birth = data.residence_list[0].value;
          const residence = _.find(data.residence_list, { value: state.user.residence });
-         state.user.phone = state.user.phone ? state.user.phone : '+' + residence.phone_idd;
+         state.user.phone = state.user.phone ? state.user.phone : residence.phone_idd ? '+' + residence.phone_idd : '';
       })
       .catch(error_handler);
 
    residence_promise
       .then(
-         () => liveapi.cached.send({ states_list: state.user.residence })
+      () => liveapi.cached.send({ states_list: state.user.residence })
       )
       .then((data) => {
-         console.log(data.states_list);
-         state.user.state_address_array = [{text:'Please select', value:''}, ...data.states_list];
+         state.user.state_address_array = [{ text: 'Please select', value: '' }, ...data.states_list];
          state.user.state_address = state.user.state_address_array[0].value;
       })
       .catch(error_handler);
+
+   // Gets available currency for the current user.
+   const update_currencies = () => {
+      const authorize = local_storage.get("authorize");
+      liveapi.cached.send({ landing_company_details: authorize.landing_company_name })
+         .then((data) => {
+            if (!data.landing_company_details || !data.landing_company_details.legal_allowed_currencies)
+               return;
+            const currencies = data.landing_company_details.legal_allowed_currencies;
+            const currencies_config = local_storage.get("currencies_config") || {};
+            const cr_accts = _.filter(Cookies.loginids(), { is_cr: true });
+            const has_fiat = _.some(cr_accts, { type: 'fiat' });
+            if (!has_fiat)
+               state.user.available_currencies = currencies.filter((c) => {
+                  return currencies_config[c] && currencies_config[c].type === 'fiat';
+               });
+            else
+               state.user.available_currencies = _.difference(
+                  currencies.filter((c) => {
+                     return currencies_config[c] && currencies_config[c].type === 'crypto';
+                  }),
+                  _.filter(cr_accts, { type: 'crypto' }).map((acc) => acc.currency || '')
+               );
+         });
+   };
+   what_todo === 'new-account' && update_currencies();
 }
 
 export default { init }
+// req.salutation = state.user.salutation;
+// req.first_name = state.user.first_name;
+// req.last_name = state.user.last_name;
+// req.account_opening_reason = state.user.account_opening_reason;
+// req.date_of_birth = state.user.date_of_birth;
+// req.address_line_1 = state.user.address_line_1;
+// req.address_line_2 = state.user.address_line_1;
+// req.city_address = state.user.city_address;
+// req.state_address = state.user.state_address;
+// req.address_postcode = state.user.address_postcode;
+// req.phone = state.user.phone;
+// req.residence = state.user.residence;
+// req.residence_name = state.user.residence_name;

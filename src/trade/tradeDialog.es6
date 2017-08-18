@@ -48,7 +48,7 @@ import 'jquery-ui';
 import 'common/util';
 import help from 'help/help';
 
-require(['trade/tradeConf']); /* trigger async loading of trade Confirmation */
+import('trade/tradeConf'); /* trigger async loading of trade Confirmation */
 var replacer = function (field_name, value) { return function (obj) { obj[field_name] = value; return obj; }; };
 var debounce = rv.formatters.debounce;
 
@@ -332,7 +332,7 @@ function init_state(available,root, dialog, symbol, contracts_for_spot){
     basis: {
       array: ['Payout', 'Stake'],
       value: 'payout',
-      amount: 10,
+      amount: isBTC() ? 0.002 : 10,
       limit: null,
     },
     spreads: {
@@ -818,10 +818,6 @@ function init_state(available,root, dialog, symbol, contracts_for_spot){
         state.proposal.error = err.message;
         state.proposal.message = '';
         state.proposal.loading = false;
-        if (err.echo_req && err.echo_req.proposal && err.details) {
-          state.proposal.ask_price = err.details.display_value;
-          state.proposal.message = err.details.longcode;
-        }
         return err;
       });
     /* update last_promise to invalidate previous requests */
@@ -887,7 +883,7 @@ function init_state(available,root, dialog, symbol, contracts_for_spot){
         return;
     }
     try {
-        const [tradeConf] = await require(['trade/tradeConf']);
+        const [tradeConf] = await import('trade/tradeConf');
         const data = await liveapi.send({
                 buy: state.proposal.id,
                 price: state.proposal.ask_price * 1,
@@ -1052,7 +1048,7 @@ export function init(symbol, contracts_for, saved_template, isTrackerInitiated) 
     dialog.set_template = set_current_template.bind(undefined, state);
     saved_template && (saved_template.name !== undefined) && dialog.set_template(saved_template);
     dialog.hide_template_menu = () => { state.template.visible = false; };
-    require(['trade/tradeTemplateManager'], function(tradeTemplateManager) {
+    import('trade/tradeTemplateManager').then((tradeTemplateManager) => {
       tradeTemplateManager.init(root.find('.trade-template-manager-root'), dialog);
     });
     // window.state = state; window.av = available; window.moment = moment; window.dialog = dialog; window.times_for = trading_times_for;

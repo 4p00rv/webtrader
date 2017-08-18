@@ -135,6 +135,9 @@ module.exports = {
                     const decoded_content = decoder.write(content);
                     return Buffer.from(decoded_content.replace(/<style-url>/g, 'https://style.binary.com'))
                 }
+            }, {
+                from: 'translations/i18n/json/*',
+                to: 'i18n/[name].[ext]'
             }
         ]),
         new webpack.ContextReplacementPlugin(/^\.\/locale$/, context => {
@@ -151,9 +154,14 @@ module.exports = {
             'process.env.NODE_ENV': '"development"',
             'global': {}, // bizarre lodash(?) webpack workaround
             'global.GENTLY': false // superagent client fix
+        }),
+        new webpack.ProvidePlugin({
+            $: "jquery",
+            jQuery: "jquery",
+            Highcharts: "highstock-release"
         })
     ],
-    target: 'node',
+    target: 'web',
     resolve: {
         modules: ['node_modules', 'bower_components', 'translations', 'src'],
         extensions: ['.es6', '.js', '.css', '.scss'],
@@ -183,5 +191,10 @@ module.exports = {
             'highstock-release': 'highstock-release',
             'jquery-growl': 'jquery.growl'
         }
+    },
+    devServer: {
+        contentBase: path.join(__dirname, "dist/bundle"),
+        compress: true,
+        port: 9001
     }
 }

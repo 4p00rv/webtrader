@@ -116,7 +116,7 @@ const on_arrow_click =(e) => {
     let transaction = table.api().row(tr).data();
     transaction = _.last(transaction);
     $target.addClass('button-disabled');
-    require(['viewtransaction/viewTransaction'],(viewTransaction) => {
+    import('viewtransaction/viewTransaction').then((viewTransaction) => {
     viewTransaction.init(transaction.contract_id, transaction.transaction_id)
                     .then(() => $target.removeClass('button-disabled')).catch((err)=>{
                         $target.removeClass('button-disabled');

@@ -103,7 +103,7 @@ const init_state = (root) => {
             state.btn.disabled = false;
             $.growl.notice({ message: 'Password successfully updated.'.i18n()});
             $.growl.notice({ message: 'Redirecting to oauth login page,<br/>Please use your new password to login.'.i18n()});
-            require(['oauth/login'], (login) => {
+            import('oauth/login').then((login) => {
                _.defer(() => login.login(), 1000);
             });
             password_win.dialog('close');

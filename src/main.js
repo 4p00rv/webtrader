@@ -4,7 +4,7 @@
 import $ from 'jquery';
 import 'jquery-ui';
 import $growl from 'jquery-growl';
-import 'modernizr';
+import 'imports-loader?this=>window!modernizr';
 
 /*
  * patch for jquery growl functions.
@@ -67,7 +67,7 @@ function load_ondemand(element, event_name, msg, module_name, callback) {
             return;
         }
 
-        System.import(module_name).then(function(module) {
+        import(module_name).then(function(module) {
             msg && $.growl.notice({ message: msg });
             callback && callback(module);
         });
@@ -76,10 +76,10 @@ function load_ondemand(element, event_name, msg, module_name, callback) {
 }
 
 var i18n_name = (window.local_storage.get("i18n") || { value: "en" }).value;
-System.import("i18n/" + i18n_name + ".json").then(function(lang_json) {
+$.getJSON("i18n/" + i18n_name + ".json").then(function(lang_json) {
     "use strict";
     /* setup translating string literals */
-    window.setup_i18n_translation(JSON.parse(lang_json));
+    window.setup_i18n_translation(lang_json);
     if (i18n_name === "ar") {
         $("body").addClass("rtl-direction");
     }
@@ -211,7 +211,17 @@ System.import("i18n/" + i18n_name + ".json").then(function(lang_json) {
                 help.init_help(elem);
                 elem.click();
             });
-
+        
+        
+        //Trigger async loading of window sub-menu
+        import("windows/windows").then((windows) => {
+            var $windowsLI = $("#nav-menu .windows");
+            windows.init($windowsLI);
+            // hide the main loading spinner,
+            // after the `last module` has been loaded.
+            $(".sk-spinner-container").parent().hide();
+            $("body > .footer").show();
+        });
 
     };
 

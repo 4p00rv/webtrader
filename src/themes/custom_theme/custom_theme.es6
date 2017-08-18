@@ -119,12 +119,12 @@ export const init = ($menuLink) => {
             modal: true,
             destroy: () => { win = null; },
             buttons: {
-               Apply: () => require(['themes/themes'],
-                  (themes) => {
+               Apply: () => import('themes/themes')
+               .then((themes) => {
                      const $ele = $('a.theme_custom');
                      const elementText = $ele.text();
-                     const elementClass = $ele.attr('class');
-                     themes.confirmationDialog(Highcharts.getOptions(), elementClass, elementText);
+                     const themeName = $ele.attr('theme-name');
+                     themes.confirmationDialog(Highcharts.getOptions(), themeName, elementText);
                   }
                ),
                Cancel: function () {

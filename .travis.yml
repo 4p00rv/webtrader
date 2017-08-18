@@ -21,13 +21,9 @@ branches:
   - master
   - development
 before_install:
-- export DISPLAY=:99.0
-- sh -e /etc/init.d/xvfb start
-- sleep 3
 - yarn
 install:
-- yarn build-all
-#- yarn test #disable test for now(lot of issues with selenium server)
+- yarn build
 after_success:
 - git config --global user.email "arnab@binary.com"
 - git config --global user.name "Arnab Karmakar"

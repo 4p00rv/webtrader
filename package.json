@@ -1,6 +1,6 @@
 {
   "name": "Webtrader",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Webtrader for Binary.com",
   "main": "Gruntfile.js",
   "engines": {
@@ -8,7 +8,6 @@
     "npm": ">=3.0"
   },
   "devDependencies": {
-    "assert": "^1.4.1",
     "babel-core": "^6.10.4",
     "babel-loader": "^7.0.0",
     "babel-plugin-add-module-exports": "^0.2.1",
@@ -60,10 +59,9 @@
     "grunt-string-replace": "^1.0.0",
     "grunt-text-replace": "^0.4.0",
     "html-loader": "^0.4.5",
+    "imports-loader": "^0.7.1",
     "json-loader": "^0.5.4",
     "lodash": "^4.17.4",
-    "nightwatch": "^0.9.15",
-    "nightwatch-html-reporter": "^2.0.2",
     "node-sass": "^3.10.0",
     "sass-loader": "^6.0.3",
     "sass.js": "^0.10.4",
@@ -72,20 +70,20 @@
     "showdown": "^1.6.3",
     "style-loader": "^0.17.0",
     "text": "requirejs/text",
-    "webpack": "^2.5.1"
+    "webpack": "^2.5.1",
+    "webpack-dev-server": "^2.7.1"
   },
   "scripts": {
-    "deploy-gh-pages": "grunt default if:live if:beta",
-    "start": "grunt && concurrently -k \"grunt watch\" \"grunt connect\"",
+    "deploy-gh-pages": "grunt if:live if:beta",
+    "start": "webpack-dev-server",
     "watch": "grunt watch",
     "server": "grunt connect",
     "mainTask": "grunt mainTask",
-    "build-all": "grunt",
     "sloc": "grunt sloc",
     "major-rel": "grunt bump:major",
     "minor-rel": "grunt bump:minor",
     "patch-rel": "grunt bump:patch",
-    "postinstall": "bower install && node nightwatch.conf.js",
+    "postinstall": "bower install",
     "build": "webpack --progress --colors --watch -d --devtool source-map --config ./webpack.config.js"
   },
   "repository": {
@@ -114,7 +112,7 @@
     "jquery.growl": "ksylvest/jquery-growl",
     "moment": "^2.18.1",
     "regenerator-runtime": "^0.10.1",
-    "webtrader-charts": "^0.3.3"
+    "webtrader-charts": "^0.3.6"
   },
   "contributors": [
     {

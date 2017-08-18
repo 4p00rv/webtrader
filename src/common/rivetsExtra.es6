@@ -13,7 +13,7 @@ import 'color-picker';
 
 /* Rivets js does not allow manually observing properties from javascript,
        Use "rv.bind().observe('path.to.object', callback)" to subscribe */
-rivets._.View.prototype.observe = function (keypath, callback) {
+rv._.View.prototype.observe = function (keypath, callback) {
    let model = this.models, inx = 0;
    while ((inx = keypath.indexOf('.')) !== -1) {
       model = model[keypath.substring(0,inx)];
@@ -169,10 +169,11 @@ rv.formatters.debounce = (value, callback, timeout = 250) => {
    callback._timer_notify = setTimeout(callback.bind(undefined,value), timeout);
    return value;
 }
-
+// Filter array based on property.
+rv.formatters.filter = (array, prop, value) => _.filter(array, (e) => e[prop] === value );
 /* turn current select item into a jquery-ui-selectmenu, update value on change */
 rv.binders.selectmenu = {
-   priority: 100,
+   priority: 101,
    publishes: true,
    bind: function (el) {
       const publish = this.publish,
@@ -214,11 +215,18 @@ rv.binders['is-valid-number'] = {
    },
    unbind: (el) => { },
    routine: (el, value) => { }
+}
+
+/* bindar for jqueyr ui selectmenu options */
+rv.binders['dom-*'] = function (el, value) {
+   const method = this.args[0];
+   if(value)
+      setTimeout(() => el[method](), 0);
 };
 
 /* bindar for jqueyr ui selectmenu options */
 rv.binders['selectmenu-*'] = function (el, value) {
-      console.log('Called')
+   this.args[0] = {appendto: 'appendTo'}[this.args[0]] || this.args[0];
    $(el).selectmenu('option', this.args[0], value);
 }
 /*binder for hidding overflow on selctmenu*/
@@ -307,6 +315,19 @@ rv.binders.spinner = {
    routine: (el,value) => $(el).webtrader_spinner('value', value*1)
 };
 
+/* bind to pressing Enter key in input*/
+rv.binders['input-enter'] = {
+   priority: 93,
+   publishes: false,
+   routine: (el, callback) => {
+      $(el).keyup(function(event){
+         if(event.keyCode == 13){
+            callback();
+         }
+      });
+   },
+   function: true
+} 
 /* bind values to jquery ui spinner options like 'min', 'max', ... */
 rv.binders['spinner-*'] = function(el,value) {
    $(el).webtrader_spinner('option', this.args[0], value);
@@ -642,7 +663,7 @@ const component_twoway_bind = (self, data, keypathes) => {
       }
    }, 0);
 }
-rivets.components['price-spinner'] = {
+rv.components['price-spinner'] = {
    static: ['class', 'min'],
    template:
    () => `<span class="ui-spinner ui-widget ui-widget-content ui-corner-all">
@@ -652,7 +673,10 @@ rivets.components['price-spinner'] = {
       const decimals = (data.decimals || 2)*1;
       const min = (data.min || 0)*1;
       component_twoway_bind(this, data, ['data.value']);
-
+      $(el).on("change", () => {
+            data.value = (+data.value).toFixed(decimals);
+      });
+      $(el).trigger("change");
       return {
          data: data
       };
