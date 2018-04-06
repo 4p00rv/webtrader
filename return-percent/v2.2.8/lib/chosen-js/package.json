@@ -1,31 +1,18 @@
 {
-  "_from": "chosen-js@^1.6.2",
-  "_id": "chosen-js@1.8.3",
-  "_inBundle": false,
-  "_integrity": "sha512-B1ruoi+9Y51W9lcw5BXBOWdWGrEGyk7sAPlBYn3tmmUKM/JelfFCrhR70tSAZ4YZlfGBdrbXTCHWxpHS/GwGCg==",
-  "_location": "/chosen-js",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "range",
-    "registry": true,
-    "raw": "chosen-js@^1.6.2",
-    "name": "chosen-js",
-    "escapedName": "chosen-js",
-    "rawSpec": "^1.6.2",
-    "saveSpec": null,
-    "fetchSpec": "^1.6.2"
-  },
-  "_requiredBy": [
-    "/"
+  "name": "chosen-js",
+  "version": "1.6.2",
+  "description": "Chosen is a JavaScript plugin that makes select boxes user-friendly. It is currently available in both jQuery and Prototype flavors.",
+  "keywords": [
+    "select",
+    "multiselect",
+    "dropdown",
+    "form",
+    "input",
+    "ui"
   ],
-  "_resolved": "https://registry.npmjs.org/chosen-js/-/chosen-js-1.8.3.tgz",
-  "_shasum": "1f953aef905d9760c14b5facc839a5f47eb356ec",
-  "_spec": "chosen-js@^1.6.2",
-  "_where": "/Users/4p00rv/binary/webtrader",
-  "bugs": {
-    "url": "https://github.com/harvesthq/chosen/issues"
-  },
-  "bundleDependencies": false,
+  "homepage": "https://harvesthq.github.io/chosen/",
+  "bugs": "https://github.com/harvesthq/chosen/issues",
+  "license": "MIT",
   "contributors": [
     {
       "name": "Patrick Filler",
@@ -44,34 +31,18 @@
       "url": "https://github.com/koenpunt"
     }
   ],
-  "dependencies": {},
-  "deprecated": false,
-  "description": "Chosen is a JavaScript plugin that makes select boxes user-friendly. It is currently available in both jQuery and Prototype flavors.",
+  "dependencies": {
+    "jquery": ">=1.4.4"
+  },
   "files": [
     "chosen.jquery.js",
-    "chosen.jquery.min.js",
-    "chosen.proto.js",
-    "chosen.proto.min.js",
     "chosen.css",
-    "chosen.min.css",
     "chosen-sprite@2x.png",
     "chosen-sprite.png"
   ],
-  "homepage": "https://harvesthq.github.io/chosen/",
-  "keywords": [
-    "select",
-    "multiselect",
-    "dropdown",
-    "form",
-    "input",
-    "ui"
-  ],
-  "license": "MIT",
   "main": "chosen.jquery.js",
-  "name": "chosen-js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/harvesthq/chosen.git"
-  },
-  "version": "1.8.3"
+    "url": "https://github.com/harvesthq/chosen.git"
+  }
 }
