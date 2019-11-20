@@ -89,6 +89,15 @@ jobs:
       - build
       - docker
       - k8s_deploy
+
+  release-beta:
+    docker:
+      - image: circleci/node:12.13.0-stretch
+    steps:
+      - git_checkout_from_cache
+      - npm_install
+      - build
+      - docker
       
 workflows:
   release:
@@ -97,4 +106,11 @@ workflows:
           filters:
             branches:
               only: /^master$/
+
+  release-beta:
+    jobs:
+      - release-beta:
+          filters:
+            branches:
+              only: /^development$/
 
